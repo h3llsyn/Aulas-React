@@ -1,0 +1,15 @@
+.heading{
+    margin: 3.2rem;
+    display: flex;
+    align-items: center;
+    gap: 2.4rem;
+    justify-content: center;
+}
+
+.cyan{
+    color: cyan;
+}
+
+.verde{
+    color: var(--primary-light);
+}

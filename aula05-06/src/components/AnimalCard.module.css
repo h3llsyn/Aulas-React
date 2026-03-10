@@ -1,0 +1,27 @@
+.card {
+  background-color: var(--color-card-bg);
+  border-radius: 16px;
+  padding: 20px;
+  margin: 15px 0;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.name {
+  color: var(--color-nature);
+  margin-bottom: 5px;
+}
+
+.species {
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+.danger {
+  color: var(--color-danger);
+  font-weight: bold;
+}
+
+.safe {
+  color: var(--color-safe);
+  font-weight: bold;
+}
