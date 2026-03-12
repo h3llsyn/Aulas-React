@@ -1,14 +1,14 @@
 import styles from './styles.module.css'
 
-export function ContainerFormulario() {
+export function Formulario() {
     return (
         <form className='formulario' action="">
             <div>
                 <label htmlFor="task">task</label>
                 <input type="text" id="meuInput" />
             </div>
-            <div>
-                linha verde
+            <div className={styles.formularioHr}>
+                <hr  />
             </div>
             <div>
                 <p>Ciclos</p>
