@@ -1,19 +1,20 @@
+import type React from 'react';
 import styles from './styles.module.css'
+type FormularioProps = {
+    id: string;
+    labelText: string;
+} & React.Component<'input'>;
 
-export function Formulario() {
+export function Formulario({
+    id,
+    type,
+    labelText = "task",
+    ...rest
+}: FormularioProps) {
     return (
-        <form className='formulario' action="">
-            <div>
-                <label htmlFor="task">task</label>
-                <input type="text" id="meuInput" />
-            </div>
-            <div className={styles.formularioHr}>
-                <hr  />
-            </div>
-            <div>
-                <p>Ciclos</p>
-            </div>
-            <button>Enviar</button>
-        </form>
+        <>
+            <label htmlFor="{id}">{labelText}</label>
+            <input className={styles.input} type="{type}" id="{id}" {...rest} />
+        </>
     );
 }
