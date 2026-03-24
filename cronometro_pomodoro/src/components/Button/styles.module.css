@@ -1,3 +1,25 @@
 .button{
-
+    background-color: blueviolet;
+    transition: all 0.1 ease-in-out;
+    display: flex;
+    align-items: center;
+    padding: 0.8rem;
+    border-radius: 0.8rem;
+    margin: 4.8rem 0;
+    cursor: pointer;
+}
+.button svg{
+    width: 3.2rem;
+    height: 3.2rem;
+}
+.button:hover{
+    filter: brightness(80%);
+}
+.green{
+    background-color: var(--primary);
+    color: var(--text-over-primary);
+}
+.red{
+    background-color: red;
+    color: var(--text-over-error);
 }

@@ -8,6 +8,9 @@ import { CountDown } from './components/CountDown'
 import { Formulario } from './components/Formulario'
 import { Cycles } from './components/Cycles'
 import { Button } from './components/Button'
+import {CirclePlay} from 'lucide-react'
+import {CircleStop} from 'lucide-react'
+import {Footer} from './components/Footer'
 
 export function App() {
   return (
@@ -40,7 +43,8 @@ export function App() {
             <Cycles />
           </div>
           <div className='formRow'>
-            <Button/>
+            <Button icon={<CirclePlay/>} color='green'/>
+            <Button icon={<CircleStop/>} color='red'/>
           </div>
         </form>
       </Container>
@@ -51,6 +55,10 @@ export function App() {
 
       <Container>
         <Heading>Menu</Heading>
+      </Container>
+
+      <Container>
+        <Footer/>
       </Container>
     </>
   )
