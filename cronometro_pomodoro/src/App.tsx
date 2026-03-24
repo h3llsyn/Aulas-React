@@ -7,6 +7,7 @@ import { Menu } from './components/Menu'
 import { CountDown } from './components/CountDown'
 import { Formulario } from './components/Formulario'
 import { Cycles } from './components/Cycles'
+import { Button } from './components/Button'
 
 export function App() {
   return (
@@ -27,7 +28,10 @@ export function App() {
         <form className="form" action="">
           <div>
             <label htmlFor="task">task</label>
-            <input type="text" id="meuInput" />
+            <input type="text" id="meuInput" placeholder='Digite algo...' />
+          </div>
+          <div className="formRow">
+            <Formulario labelText='task' id='meuInput' type='text' placeholder='Digite algo...'/>
           </div>
           <div className='formRow'>
             linha verde
@@ -35,12 +39,10 @@ export function App() {
           <div className='formRow'>
             <Cycles />
           </div>
-          <button>Enviar</button>
+          <div className='formRow'>
+            <Button/>
+          </div>
         </form>
-      </Container>
-
-      <Container>
-        <Formulario />
       </Container>
 
       <Container>
