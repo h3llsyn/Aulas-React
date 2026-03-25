@@ -15,6 +15,10 @@ import {Footer} from './components/Footer'
 export function App() {
   return (
     <>
+      <Heading>
+        Número: <span id='numero'>0</span>
+      </Heading>
+      
       <Container>
         <Logo />
       </Container>
@@ -29,10 +33,6 @@ export function App() {
 
       <Container>
         <form className="form" action="">
-          <div>
-            <label htmlFor="task">task</label>
-            <input type="text" id="meuInput" placeholder='Digite algo...' />
-          </div>
           <div className="formRow">
             <Formulario labelText='task' id='meuInput' type='text' placeholder='Digite algo...'/>
           </div>
