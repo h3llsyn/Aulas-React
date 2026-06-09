@@ -5,7 +5,7 @@ interface BotaoPadraoProps extends ButtonHTMLAttributes<HTMLButtonElement>{
 
 }
 
-export function BotaoPadrao({className, children,...rest}:BotaoPadraoProps){
+export function BotaoPadrao({className, children}:BotaoPadraoProps){
     return(
         <>
         <button
