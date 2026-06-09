@@ -1,63 +1,109 @@
-import { Container } from "../../components/Container";
-import { ListaCursos, type Curso } from "../../ListaCursos"
-import { MainForm } from "../../MainForm";
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
+import { Container } from '../../components/Container';
+import { MainForm } from '../../MainForm';
+import { ListaCursos, type Curso } from '../../ListaCursos/';
 
-export function Home(){
-    const[cursos,setCursos]=useState<Curso[]>(()=>{
-        const cursosSalvos = localStorage.getItem('cursosLocalStorage');
-        if(cursosSalvos){
-            return JSON.parse(cursosSalvos);
-        }
-        return[];
-    });
+// A VITE_API_URL agora aponta para "/api" que o Vite (local) e a Vercel (prod) vão redirecionar sem CORS.
+const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
-    const [cursoEmEdicao,setCursoEmEdicao]=useState<Curso | null>(null);
+export function Home() {
+  const [cursos, setCursos] = useState<Curso[]>([]);
+  const [cursoEmEdicao, setCursoEmEdicao] = useState<Curso | null>(null);
 
-    useEffect(()=>{
-        localStorage.setItem('cursosLocalStorage', JSON.stringify(cursos));
-    },[cursos]);
-
-    const adicionarCurso = (novoCurso:Curso)=>{
-        setCursos((cursosAtuais)=>{
-            const maiorIdAtual = cursosAtuais.length > 0? Math.max(...cursosAtuais.map(curso=>Number(curso.id))):0;
-            const cursoFinal={...novoCurso,id:String(maiorIdAtual +1)};
-            return[...cursosAtuais,cursoFinal];
-        });
-    };
-
-    const excluirCurso=(id:string)=>{
-        const cursosAtualizados=cursos.filter((curso)=>String(curso.id) !==String(id));
-        setCursos(cursosAtualizados);
-    };
-
-    const atualizarCurso = (cursosAtualizados:Curso)=>{
-        const cursosAtualizado = cursos.map((curso)=>
-            String(curso.id)===String(cursosAtualizados.id)? cursosAtualizados:curso
-        );
-        setCursos(cursosAtualizado);
-        setCursoEmEdicao(null);
+  const carregarCursos = async () => {
+    try {
+      const res = await fetch(`${apiUrl}/cursos`);
+      if (res.ok) {
+        const data = await res.json();
+        // Caso a API retorne páginas ou um array dentro de content
+        const lista = Array.isArray(data) ? data : (data.content || []);
+        
+        // Se a API não retornar o ID (problema no backend), usamos o index temporariamente para o React não quebrar.
+        const listaComIds = lista.map((item: any, index: number) => ({
+          ...item,
+          id: item.id || String(index + 1)
+        }));
+        
+        setCursos(listaComIds);
+      }
+    } catch (err) {
+      console.error("Erro ao carregar cursos:", err);
     }
+  };
 
-    const editarCurso=(curso:Curso)=>{
-        setCursoEmEdicao(curso)
-    };
+  useEffect(() => {
+    carregarCursos();
+  }, []);
 
-    return(
-        <>
-            <Container>
-                <MainForm
-                    aoAdicionar={adicionarCurso}
-                    aoAtualizar={atualizarCurso}
-                    cursoEmEdicao={cursoEmEdicao}
-                />
+  const adicionarCurso = async (novoCurso: Curso) => {
+    try {
+      const res = await fetch(`${apiUrl}/cursos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          nome: novoCurso.nome.toUpperCase(), 
+          periodo: novoCurso.periodo.toUpperCase() 
+        })
+      });
+      if (res.ok) {
+        carregarCursos();
+      } else {
+        console.error("Erro na API ao criar curso");
+      }
+    } catch (err) {
+      console.error("Erro ao adicionar curso:", err);
+    }
+  };
 
-                <ListaCursos
-                    cursos={cursos}
-                    aoEditar={editarCurso}
-                    aoExcluir={excluirCurso}
-                />
-            </Container>
-        </>
-    );
+  const excluirCurso = async (id: string) => {
+    try {
+      const res = await fetch(`${apiUrl}/cursos/${id}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        carregarCursos();
+      }
+    } catch (err) {
+      console.error("Erro ao excluir curso:", err);
+    }
+  };
+
+  const editarCurso = (curso: Curso) => {
+    setCursoEmEdicao(curso);
+  };
+
+  const atualizarCurso = async (cursoAtualizado: Curso) => {
+    try {
+      const res = await fetch(`${apiUrl}/cursos`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: Number(cursoAtualizado.id),
+          nome: cursoAtualizado.nome.toUpperCase(),
+          periodo: cursoAtualizado.periodo.toUpperCase()
+        })
+      });
+      if (res.ok) {
+        carregarCursos();
+        setCursoEmEdicao(null);
+      }
+    } catch (err) {
+      console.error("Erro ao atualizar curso:", err);
+    }
+  };
+
+  return (
+    <Container>
+      <MainForm 
+        aoAdicionar={adicionarCurso} 
+        aoAtualizar={atualizarCurso}
+        cursoEmEdicao={cursoEmEdicao}
+      />
+      <ListaCursos 
+        cursos={cursos} 
+        aoEditar={editarCurso} 
+        aoExcluir={excluirCurso} 
+      />
+    </Container>
+  );
 }

@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "titulo": "React para Iniciantes",
+    "descricao": "Aprenda os fundamentos do React, componentes e hooks.",
+    "instrutor": "Luiz Henrique",
+    "ativo": true
+  },
+  {
+    "id": 2,
+    "titulo": "Aprofundando em TypeScript",
+    "descricao": "Tipagem avançada, interfaces e integração com React.",
+    "instrutor": "Maria Silva",
+    "ativo": true
+  },
+  {
+    "id": 3,
+    "titulo": "Estilização com Tailwind e CSS",
+    "descricao": "Como deixar seu Front-end profissional e responsivo.",
+    "instrutor": "João Mendes",
+    "ativo": false
+  }
+]
