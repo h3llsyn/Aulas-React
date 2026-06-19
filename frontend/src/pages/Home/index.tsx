@@ -3,7 +3,7 @@ import { ListaCursos, type Curso } from "../../ListaCursos"
 import { MainForm } from "../../MainForm";
 import { useState, useEffect } from "react";
 
-const API_URL = 'http://localhost:8080/cursos';
+const API_URL = 'https://api-rest-pe67.onrender.com/cursos';
 
 export function Home(){
     const [cursos, setCursos] = useState<Curso[]>([]);
