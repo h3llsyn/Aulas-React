@@ -1,109 +1,105 @@
-import { useState, useEffect } from 'react';
-import { Container } from '../../components/Container';
-import { MainForm } from '../../MainForm';
-import { ListaCursos, type Curso } from '../../ListaCursos/';
+import { Container } from "../../components/Container";
+import { ListaCursos, type Curso } from "../../ListaCursos"
+import { MainForm } from "../../MainForm";
+import { useState, useEffect } from "react";
 
-// A VITE_API_URL agora aponta para "/api" que o Vite (local) e a Vercel (prod) vão redirecionar sem CORS.
-const apiUrl = import.meta.env.VITE_API_URL || '/api';
+const API_URL = 'http://localhost:8080/cursos';
 
-export function Home() {
-  const [cursos, setCursos] = useState<Curso[]>([]);
-  const [cursoEmEdicao, setCursoEmEdicao] = useState<Curso | null>(null);
+export function Home(){
+    const [cursos, setCursos] = useState<Curso[]>([]);
+    const [cursoEmEdicao, setCursoEmEdicao] = useState<Curso | null>(null);
+    const [carregando, setCarregando] = useState(true);
+    const [erro, setErro] = useState<string | null>(null);
 
-  const carregarCursos = async () => {
-    try {
-      const res = await fetch(`${apiUrl}/cursos`);
-      if (res.ok) {
-        const data = await res.json();
-        // Caso a API retorne páginas ou um array dentro de content
-        const lista = Array.isArray(data) ? data : (data.content || []);
-        
-        // Se a API não retornar o ID (problema no backend), usamos o index temporariamente para o React não quebrar.
-        const listaComIds = lista.map((item: any, index: number) => ({
-          ...item,
-          id: item.id || String(index + 1)
-        }));
-        
-        setCursos(listaComIds);
-      }
-    } catch (err) {
-      console.error("Erro ao carregar cursos:", err);
-    }
-  };
+    const buscarCursos = async () => {
+        try {
+            setCarregando(true);
+            setErro(null);
+            const resposta = await fetch(API_URL);
+            if (!resposta.ok) throw new Error('Erro ao buscar cursos');
+            const dados = await resposta.json();
+            setCursos(dados);
+        } catch (e) {
+            setErro('Não foi possível conectar com o servidor.');
+        } finally {
+            setCarregando(false);
+        }
+    };
 
-  useEffect(() => {
-    carregarCursos();
-  }, []);
+    useEffect(() => {
+        buscarCursos();
+    }, []);
 
-  const adicionarCurso = async (novoCurso: Curso) => {
-    try {
-      const res = await fetch(`${apiUrl}/cursos`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          nome: novoCurso.nome.toUpperCase(), 
-          periodo: novoCurso.periodo.toUpperCase() 
-        })
-      });
-      if (res.ok) {
-        carregarCursos();
-      } else {
-        console.error("Erro na API ao criar curso");
-      }
-    } catch (err) {
-      console.error("Erro ao adicionar curso:", err);
-    }
-  };
+    const adicionarCurso = async (novoCurso: Omit<Curso, 'id'>) => {
+        try {
+            const resposta = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome: novoCurso.nome, periodo: novoCurso.periodo }),
+            });
+            if (!resposta.ok) {
+                const msg = await resposta.text();
+                throw new Error(msg || 'Erro ao cadastrar curso');
+            }
+            await buscarCursos();
+        } catch (e: any) {
+            alert(e.message || 'Erro ao cadastrar curso.');
+        }
+    };
 
-  const excluirCurso = async (id: string) => {
-    try {
-      const res = await fetch(`${apiUrl}/cursos/${id}`, {
-        method: 'DELETE'
-      });
-      if (res.ok) {
-        carregarCursos();
-      }
-    } catch (err) {
-      console.error("Erro ao excluir curso:", err);
-    }
-  };
+    const excluirCurso = async (id: string) => {
+        try {
+            const resposta = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+            if (!resposta.ok) throw new Error('Erro ao excluir curso');
+            await buscarCursos();
+        } catch (e) {
+            alert('Erro ao excluir curso.');
+        }
+    };
 
-  const editarCurso = (curso: Curso) => {
-    setCursoEmEdicao(curso);
-  };
+    const atualizarCurso = async (cursoAtualizado: Curso) => {
+        try {
+            const resposta = await fetch(API_URL, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: cursoAtualizado.id,
+                    nome: cursoAtualizado.nome,
+                    periodo: cursoAtualizado.periodo,
+                }),
+            });
+            if (!resposta.ok) throw new Error('Erro ao atualizar curso');
+            setCursoEmEdicao(null);
+            await buscarCursos();
+        } catch (e) {
+            alert('Erro ao atualizar curso.');
+        }
+    };
 
-  const atualizarCurso = async (cursoAtualizado: Curso) => {
-    try {
-      const res = await fetch(`${apiUrl}/cursos`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: Number(cursoAtualizado.id),
-          nome: cursoAtualizado.nome.toUpperCase(),
-          periodo: cursoAtualizado.periodo.toUpperCase()
-        })
-      });
-      if (res.ok) {
-        carregarCursos();
-        setCursoEmEdicao(null);
-      }
-    } catch (err) {
-      console.error("Erro ao atualizar curso:", err);
-    }
-  };
+    const editarCurso = (curso: Curso) => {
+        setCursoEmEdicao(curso);
+    };
 
-  return (
-    <Container>
-      <MainForm 
-        aoAdicionar={adicionarCurso} 
-        aoAtualizar={atualizarCurso}
-        cursoEmEdicao={cursoEmEdicao}
-      />
-      <ListaCursos 
-        cursos={cursos} 
-        aoEditar={editarCurso} 
-        aoExcluir={excluirCurso} 
-      />
-    </Container>
-  );
+    return (
+        <>
+            <Container>
+                <MainForm
+                    aoAdicionar={adicionarCurso}
+                    aoAtualizar={atualizarCurso}
+                    cursoEmEdicao={cursoEmEdicao}
+                />
+
+                {carregando && <p style={{ textAlign: 'center', color: '#5c5c5c' }}>Carregando...</p>}
+                {erro && <p style={{ textAlign: 'center', color: '#ce0000' }}>{erro}</p>}
+
+                {!carregando && !erro && (
+                    <ListaCursos
+                        cursos={cursos}
+                        aoEditar={editarCurso}
+                        aoExcluir={excluirCurso}
+                    />
+                )}
+            </Container>
+        </>
+    );
 }
